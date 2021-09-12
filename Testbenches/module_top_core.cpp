@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-#define project_dir "/home/william/William/w1/"
+#define project_dir "YOUR_DIRECTORY"
 
 using namespace std;
 Vtop_core *top;                      // Instantiation of model

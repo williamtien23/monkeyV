@@ -1,7 +1,20 @@
 # riscv32i_w1
- <strong> About The Project </strong> <br> 
+ <strong> Contents </strong> <br>
+ <ol>
+  <li> About The Project </li>  
+  <li> A Couple Hacks (for the time being) </li>
+  <li> To Do </li>
+  <li> Project Structure </li>
+  <li> Using My Bash Script </li>
+  <li> Schematics </li>
+  <li> The ALU Test </li>
+  <li> The Sample C Program Test </li>
+</ol>
+<br>
+
+<strong> About The Project </strong> <br> 
  This is my (partially completed) first implementation of a RISCV architecture. The implementation is a 5-stage pipeline that currently only stalls during hazards. It currently has no internal instruction or data memory. I am using Verilator and a C++ wrapper to provide the core with an external "ideal 1 cycle read/write" memory for the time being. The instruction and data "memory" are split. 
- 
+
 <br> 
 
  <strong> A Couple Hacks (for the time being): </strong><br>
@@ -14,6 +27,7 @@
  
   <strong> To Do: </strong><br>
 <ul>
+  <li>Code/Naming cleanup </li> 
   <li>Setup the compliance test suite </li>  
   <li>Implement instruction and data TCM or Cache </li>
   <li>Write a startup routine and set the memory map</i></li>
@@ -37,6 +51,42 @@
   <li>Run the ALU_i tests by changing target with:<i> bash project.sh simulate -target alu_i module_alu_i</i></li>
 </ul>
 <br>
+
+<strong> Schematics </strong> <br><br>
+Top: <br>
+<img src="doc/TopCore.png">
+<br><br><br>
+IF_Stage: <br>
+<img src="doc/IFStage.png">
+<br><br><br>
+ID_Stage: <br>
+<img src="doc/ID_Stage.png">
+<br><br><br>
+EXE_Stage: <br>
+<img src="doc/ExeStage.png">
+<br><br><br>
+MEM_Stage: <br>
+<img src="doc/MemStage.png">
+<br><br><br>
+ALU_i: <br>
+<img src="doc/ALU-I.png">
+<br><br><br>
+Carry_Select_Adder: <br>
+<img src="doc/CarrySelect_Adder.png">
+<br><br><br>
+Barrel_Shifters: <br>
+<img src="doc/BarrelShifter_Left.png">
+<img src="doc/BarrelShifter_Right.png">
+<br><br><br>
+Digital Comparator: <br>
+<img src="doc/Comparator_Sheet1.png">
+<img src="doc/Comparator_Sheet2.png">
+<img src="doc/Comparator_Sheet3.png">
+<br><br><br>
+Sign_Extender: <br>
+<img src="doc/SignExt.png">
+<br><br><br>
+
 
 <strong> The ALU Test </strong> <br>
 I tested the ALU by generating random signed int values in the cpp wrapper module. The cpp wrapper performs the same ALU operations alongside the simulated verilog ALU. Both answers are compared and the result is written as a Pass or Fail to the alu_tests.txt file that generates in /Testbenches. If a test case fails, the mismatched result from the verilog ALU is also outputted. An example:<br>

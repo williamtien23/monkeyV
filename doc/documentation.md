@@ -4,7 +4,7 @@
   <li> Schematics </li>  
   <li> Compliance Tests </li>
   <li> The ALU Test </li>
- <li The Sample C Program Test </li>
+  <li> The Sample C Program Test </li>
 </ol>
 
 <strong> Schematics </strong> <br><br>

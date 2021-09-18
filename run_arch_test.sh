@@ -1,5 +1,5 @@
-arch_test_path="/home/william/riscv-arch-test"
-project_dir="/home/william/William/w1"
+arch_test_path=""
+project_dir=""
 echo "compliance compilation"
 PATH=/opt/riscv/bin:$PATH
 cd $arch_test_path

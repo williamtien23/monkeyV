@@ -1,5 +1,11 @@
 # riscv32i_w1
  <strong> Contents </strong> <br>
+<ol>
+  <li> Schematics </li>  
+  <li> Compliance Tests </li>
+  <li> The ALU Test </li>
+ <li The Sample C Program Test </li>
+</ol>
 
 <strong> Schematics </strong> <br><br>
 IF_Stage: <br>
@@ -33,6 +39,9 @@ Sign_Extender: <br>
 <img src="SignExt.png">
 <br><br><br>
 
+<strong> Compliance Tests </strong> <br>
+Running the automation bash script for the compliance tests generates the following results.
+<img src="compliance.png">
 
 <strong> The ALU Test </strong> <br>
 I tested the ALU by generating random signed int values in the cpp wrapper module. The cpp wrapper performs the same ALU operations alongside the simulated verilog ALU. Both answers are compared and the result is written as a Pass or Fail to the alu_tests.txt file that generates in /Testbenches. If a test case fails, the mismatched result from the verilog ALU is also outputted. An example:<br>

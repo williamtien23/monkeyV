@@ -1,7 +1,7 @@
 
 top_module=top_core
 cpp_module=module_compliance
-test_dir="\/home\/william\/riscv-arch-test\/work\/rv32i_m\/I\/"
+test_dir=""
 testcase="add-01"
 PATH=/opt/riscv/bin:$PATH
 

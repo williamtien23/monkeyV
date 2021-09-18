@@ -58,7 +58,7 @@ always @ (posedge Clk) begin //Write Logic
   else begin
     case (Rd_Addr) //1->32 Mux
       5'd0: begin
-            //NOP - x0 read only
+            x0 <= 0;
             end
       5'd1: x1 <= Rd_Data;
       5'd2: x2 <= Rd_Data;

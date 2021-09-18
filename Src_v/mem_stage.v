@@ -1,5 +1,8 @@
 `include "defines.v"
-
+/**
+ * Memory Stage
+ * Instantiates carry_select_adder.v (Used to calculate pc+4)
+ **/
 module mem_stage (
   input Clk,
   input Reset,
@@ -9,17 +12,17 @@ module mem_stage (
   input [31:0]      Src_imm_i,
   input [4:0]       Src_rd_i,
   input [1:0]       Inst_mem_out_sel_i,
-  //input [1:0]  Inst_mem_we_i,       //Currently feeds to cpp testbench
+//input [1:0]       Inst_mem_we_i,           //Temporarily re-routed from exe stage to cpp IO
   input [2:0]       Inst_mem_rd_sel_i,
   input             Inst_wb_we_i,
   input [7:0]       Exe_tracker,
 
-  input [31:0]      Dmem_data_read,        //Currently comes from cpp testbench
-  output [7:0]      Dmem_data_wr1,         //To cpp
-  output [7:0]      Dmem_data_wr2,
-  output [7:0]      Dmem_data_wr3,
-  output [7:0]      Dmem_data_wr4,
-  output [31:0]     Dmem_addr,            //To cpp
+  input [31:0]      Dmem_data_read,        //Temporarily comes from cpp IO
+  output [7:0]      Dmem_data_wr1,         //^
+  output [7:0]      Dmem_data_wr2,         //^
+  output [7:0]      Dmem_data_wr3,         //^
+  output [7:0]      Dmem_data_wr4,         //^
+  output [31:0]     Dmem_addr,             //^
 
   output reg [31:0] Src_wb_o,
   output reg [4:0]  Src_rd_o,
@@ -40,6 +43,10 @@ assign Dmem_addr = Src_alu_i;
 
 carry_select_adder u1 (Src_pc_i, 32'd4, 1'b0, pc_plus4, cout);
 
+/* Writeback Data Selection Block
+  Choose data to send to writeback stage
+  Can pass data read from mem, or passthrough for data from earlier stages
+*/
 always @ (*) begin
   case(Inst_mem_out_sel_i)
     `MEM_PC:  mem2wb_data = pc_plus4;
@@ -49,6 +56,9 @@ always @ (*) begin
   endcase
 end
 
+/* Data Read Extension Block
+  Reads of sizes less than word need to be 0-padded or sign extended
+*/
 always @ (*) begin
   case(Inst_mem_rd_sel_i)
   `RD_HWORD:   dmem_read_extended = {{16{Dmem_data_read[15]}},Dmem_data_read[15:0]};
@@ -59,6 +69,9 @@ always @ (*) begin
   endcase
 end
 
+/* Latch Stage Outputs Block
+  Data hazard injects NOPs into execute stage until hazard clears
+*/
 always @ (posedge Clk) begin
   if(Reset) begin
     Src_wb_o      <= 0;

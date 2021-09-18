@@ -10,8 +10,8 @@ module stall_controller(
   input       We_id2exe,
   input       We_exe2mem,
   input       We_mem2wb,
-  output      Stall_if,
-  output      Stall_id
+  output      Stall_ctrl_hazard,
+  output      Stall_data_hazard
   );
 
 /*Rules for stall:
@@ -24,17 +24,19 @@ wire src1_format, src2_format; //If instruction format uses source register x
 
 assign src1_comp = ((Rs1 == Rd_id2exe) && We_id2exe) || ((Rs1 == Rd_exe2mem) && We_exe2mem) ||  
                    ((Rs1 == Rd_mem2wb) && We_mem2wb);
+
 assign src2_comp = ((Rs2 == Rd_id2exe) && We_id2exe) || ((Rs2 == Rd_exe2mem) && We_exe2mem) || 
                    ((Rs2 == Rd_mem2wb) && We_mem2wb);
-assign src1_format = ((Opcode[6:0] == `OP_R) || (Opcode[6:0] == `OP_I_JALR) ||
-                      (Opcode[6:0] == `OP_I_LD ) || (Opcode[6:0] == `OP_I_ARITH) ||
-                      (Opcode[6:0] == `OP_S) || (Opcode[6:0] == `OP_B));
-assign src2_format = ((Opcode[6:0] == `OP_R) || (Opcode[6:0] == `OP_S) ||
-                      (Opcode[6:0] == `OP_B));
+
+assign src1_format = ((Opcode == `OP_R) || (Opcode == `OP_I_JALR) || (Opcode == `OP_I_LD ) || 
+                      (Opcode == `OP_I_ARITH) || (Opcode == `OP_S) || (Opcode == `OP_B));
+
+assign src2_format = ((Opcode == `OP_R) || (Opcode == `OP_S) || (Opcode == `OP_B));
 
 
-assign Stall_id = (src1_comp && src1_format && Rs1 != 0) || (src2_comp && src2_format && Rs2 != 0);
-assign Stall_if = Opcode[6:0] == `OP_B;
+assign Stall_data_hazard = (src1_comp && src1_format && Rs1 != 0) ||
+                           (src2_comp && src2_format && Rs2 != 0);
+assign Stall_ctrl_hazard = (Opcode == `OP_B);
 
 endmodule
 

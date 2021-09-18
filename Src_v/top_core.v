@@ -1,5 +1,5 @@
 /**
- * RV32i verilog implementation
+ * RV32i Verilog implementation
  * 5-stage pipeline: IF-ID-EXE-MEM-WB
  * Requires external Imem, Dmem
  * Assumes ideal single cycle R/W memory
@@ -53,28 +53,28 @@ module top_core (
   wire        exe2if_branch_equal;
   wire        exe2if_branch_greater; //unused
 //Hazard Ctrl
-  wire stall_if;
-  wire stall_id;
-
-
+  wire stall_ctrl_hazard;
+  wire stall_data_hazard;
+//Writeback Signals
   wire [4:0] wb_addr;
+//Pipeline Tracker Signals - optional for debug  
   wire [7:0] Aif_inst, Aid_inst, Aexe_inst, Amem_inst;
   reg [7:0] Awb_inst;
 
-assign Imem_addr_cpp = if2id_pc;
 
 if_stage fetch (
   .Clk(Clk),
   .Reset(Reset),
-  .Inst_branch_less_i(exe2if_branch_less),
-  .Inst_branch_equal_i(exe2if_branch_equal),  
-  .Src_branch_target_i(id2if_branch_target),
-  .Inst_branch_code(id2if_branch_sel),
+  .Instruction_i(Imem_data_read_cpp),  
+  .Src_branch_less_i(exe2if_branch_less),
+  .Src_branch_equal_i(exe2if_branch_equal), 
   .Src_jump_target_i(id2if_jump_target),    
-  .Jump_line(id2if_jump_sel),
-  .Instruction_i(Imem_data_read_cpp),
-  .Stall_if(stall_if),
-  .Stall_id(stall_id),
+  .Src_branch_target_i(id2if_branch_target),
+  .Inst_jump(id2if_jump_sel),  
+  .Inst_branch(id2if_branch_sel),
+  .Stall_ctrl_hazard(stall_ctrl_hazard),
+  .Stall_data_hazard(stall_data_hazard),
+  .Instruction_req_addr(Imem_addr_cpp),
   .Instruction_o(if2id_instruction),
   .Program_counter(if2id_pc),
   .IF_tracker(Aif_inst)
@@ -90,8 +90,8 @@ stall_controller stall_ctrl(
   .We_id2exe(id2exe_wb_we),
   .We_exe2mem(exe2mem_wb_we),
   .We_mem2wb(mem2wb_wb_we),
-  .Stall_if(stall_if),
-  .Stall_id(stall_id)
+  .Stall_ctrl_hazard(stall_ctrl_hazard),
+  .Stall_data_hazard(stall_data_hazard)
   );
 
 id_stage decode (
@@ -101,7 +101,8 @@ id_stage decode (
   .Src_pc_i(if2id_pc),
   .Src_rs1_i(id_rs1_data),
   .Src_rs2_i(id_rs2_data),  
-  .Stall_id(stall_id),
+  .Stall_data_hazard(stall_data_hazard),
+  .IF_tracker(Aif_inst),
   .Src_pc_o(id2exe_pc),
   .Src_rs1_o(id2exe_rs1),
   .Src_rs2_o(id2exe_rs2),   
@@ -112,14 +113,13 @@ id_stage decode (
   .Inst_exe_alu_code_o(id2exe_alu_code),
   .Inst_mem_out_sel_o(id2exe_mem_out_sel),
   .Inst_mem_we_o(id2exe_mem_we),
+  .ID_tracker(Aid_inst), 
   .Inst_mem_rd_sel_o(id2exe_mem_rd_sel),
   .Inst_wb_we_o(id2exe_wb_we),
-  .Src_branch_target_o(id2if_branch_target),
-  .Inst_branch_code(id2if_branch_sel),
-  .Src_jump_target_o(id2if_jump_target),    
+  .Src_jump_target_o(id2if_jump_target),
+  .Src_branch_target_o(id2if_branch_target), 
   .Inst_jump(id2if_jump_sel),
-  .IF_tracker(Aif_inst),
-  .ID_tracker(Aid_inst)
+  .Inst_branch(id2if_branch_sel)
   );
 
 
@@ -176,12 +176,12 @@ mem_stage memory(
   .Inst_mem_out_sel_i(exe2mem_mem_out_sel),
   .Inst_mem_rd_sel_i(exe2mem_mem_rd_sel),
   .Inst_wb_we_i(exe2mem_wb_we),
-  .Dmem_data_read(Dmem_data_read_cpp),        //Currently comes from cpp testbench
-  .Dmem_data_wr1(Dmem_data_wr1_cpp),         //To cpp
+  .Dmem_data_read(Dmem_data_read_cpp),        
+  .Dmem_data_wr1(Dmem_data_wr1_cpp),         
   .Dmem_data_wr2(Dmem_data_wr2_cpp),
   .Dmem_data_wr3(Dmem_data_wr3_cpp),
   .Dmem_data_wr4(Dmem_data_wr4_cpp),
-  .Dmem_addr(Dmem_addr_cpp),            //To cpp
+  .Dmem_addr(Dmem_addr_cpp),            
   .Src_wb_o(mem2wb_wb_data),
   .Src_rd_o(mem2wb_wb_addr),
   .Inst_wb_we_o(mem2wb_wb_we),
@@ -189,9 +189,9 @@ mem_stage memory(
   .Mem_tracker(Amem_inst)    
   );
 
-  assign wb_addr = (mem2wb_wb_we) ? (mem2wb_wb_addr) : 0; //Writes to x0 if write disabled
-
-always @ (posedge Clk) begin
+//Writeback stage
+assign wb_addr = (mem2wb_wb_we) ? (mem2wb_wb_addr) : 0; //Writes to x0 if write disabled
+always @ (posedge Clk) begin //Writeback stage instruction tracker - optional block
   if (Reset)
     Awb_inst <= 0;
   else

@@ -15,7 +15,7 @@ module carry_select_adder(
   /* verilator lint_off UNOPTFLAT */
   wire [7:0] carry_chain;
 
-  Full_Adder Group1 (A[3:0], B[3:0], Cin, Y[3:0], carry_chain[0]);
+  full_adder Group1 (A[3:0], B[3:0], Cin, Y[3:0], carry_chain[0]);
 
   genvar i;
   for (i=0; i<7; i=i+1) begin: adder
@@ -23,12 +23,12 @@ module carry_select_adder(
     wire c1_carry;
     wire [3:0] c0_sum;
     wire [3:0] c1_sum;
-    Full_Adder u1 (A[4*(i+2)-1 : 4*(i+1)], B[4*(i+2)-1 : 4*(i+1)],
+    full_adder u1 (A[4*(i+2)-1 : 4*(i+1)], B[4*(i+2)-1 : 4*(i+1)],
                    1'b0, c0_sum[3:0], c0_carry);
-    Full_Adder u2 (A[4*(i+2)-1 : 4*(i+1)], B[4*(i+2)-1 : 4*(i+1)],
+    full_adder u2 (A[4*(i+2)-1 : 4*(i+1)], B[4*(i+2)-1 : 4*(i+1)],
                    1'b1, c1_sum[3:0], c1_carry);
-    Mux_2x1 u3 (c0_sum[3:0], c1_sum[3:0], carry_chain[i], Y[4*(i+2)-1 : 4*(i+1)]);
-    Carry_Select u4 (c0_carry, c1_carry, carry_chain[i], carry_chain[i+1]); 
+    mux_2x1 u3 (c0_sum[3:0], c1_sum[3:0], carry_chain[i], Y[4*(i+2)-1 : 4*(i+1)]);
+    carry_select u4 (c0_carry, c1_carry, carry_chain[i], carry_chain[i+1]); 
   end
 
   assign Cout = carry_chain[7];
@@ -36,7 +36,7 @@ module carry_select_adder(
 endmodule
 
 //Grouped in 4 bits
-module Full_Adder ( 
+module full_adder ( 
 
   input wire [3:0] A,
   input wire [3:0] B,
@@ -60,7 +60,7 @@ module Full_Adder (
 endmodule
 
 //Basically OR and AND gate
-module Carry_Select (
+module carry_select (
 
   input wire A, B, C,
   output reg Y
@@ -72,7 +72,7 @@ module Carry_Select (
 endmodule
 
 //2 to 1 mux, 4bit bus
-module Mux_2x1 (
+module mux_2x1 (
 
   input wire [3:0] In0,
   input wire [3:0] In1,

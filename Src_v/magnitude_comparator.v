@@ -29,13 +29,14 @@ reg u_comparator_lt;
 reg u_comparator_eq;
 reg u_comparator_gt;
 
+//For Loop generates logic for 28 bit cascaded comparator using 4 bit comparator blocks
 genvar i;
 for(i=0; i<7; i=i+1) begin: l4
   magnitude_comp_4bit u1 (A[4*(i+1)-1 : 4*i], B[4*(i+1)-1 : 4*i], lt_l3[i], eq_l3[i], gt_l3[i]);
   assign lt_l4[i] = &eq_l3[7:i+1] & lt_l3[i];
   assign gt_l4[i] = &eq_l3[7:i+1] & gt_l3[i];
 end
-
+//Remaining 3 bits + 28 bits = 31 bit unsigned magnitude comparator
 magnitude_comp_3bit u1 (A[30:28], B[30:28], lt_l3[7], eq_l3[7], gt_l3[7]);
 
 always @ (*) begin: unsigned_comparator

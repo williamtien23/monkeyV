@@ -1,3 +1,7 @@
+/**
+ * Execute Stage
+ * Instantiates alu_i.v
+ **/
 module exe_stage (
   input Clk,
   input Reset,
@@ -41,6 +45,9 @@ assign src2 = (Inst_exe_src2_sel_i) ? Src_imm_i : Src_rs2_i;
 alu_i u1 (src1, src2, Inst_exe_alu_code_i[3:0], Inst_exe_alu_code_i[4], alu_out, 
           Inst_branch_less_o, Inst_branch_equal_o, Inst_branch_greater_o); 
 
+/* Latch Stage Outputs Block
+
+*/
 always @ (posedge Clk) begin //Registering outputs
   if(Reset) begin
     Src_pc_o  <= 0;

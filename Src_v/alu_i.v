@@ -1,46 +1,42 @@
 `include "defines.v"
-
+/**
+ * Integer ALU
+ * Instantiates carry_select_adder.v
+ * Instantiates magnitude_comparator.v
+ * Instantiates barrel_shifter.v
+ **/
 module alu_i(
   input [31:0] A,
   input [31:0] B,
-  input [3:0] Code,
-  input Sel, // 0 is signed compare 1 is unsigned / adder subtraction
+  input [3:0]  Code,
+  input        Sel,
+
   output reg [31:0] C,
   output Less,
   output Equal,
   output Greater
   );
 
-//CODE
-/*
-localparam ADD      = 4'd0;
-localparam SHIFT_L  = 4'd1;
-localparam SHIFT_R  = 4'd2;
-localparam XOR      = 4'd3;
-localparam OR       = 4'd4;
-localparam AND      = 4'd5;
-localparam COMP     = 4'd6;
-localparam NOP      = 4'd7;
-*/
+//Codes (see defines.v) : Add=0 Shift_l=1 Shift_r=2 XOR=3 OR=4 AND=5 Comp=6 nop=7
+//Sel : 0=signed 1=unsigned/subtraction
 
+//Adder Signals
 wire cout;
 wire [31:0] b_adder;
 assign b_adder = (Sel) ? (~B + 1) : B; //Sel add/sub encoding
-
-//Comparator unsigned/signed signals
+//Comparator Signals
 wire lt_s;
 wire eq_s; 
 wire gt_s;
 reg lt_u;
 reg eq_u;
 reg gt_u;
-
 //Output selection signals
 wire [31:0] y_adder, y_shift_l, y_shift_r;
 wire y_lt;
 
 assign y_lt     = (Sel) ? lt_u : lt_s;
-assign Less = y_lt;
+assign Less     = y_lt;
 assign Equal    = (Sel) ? eq_u : eq_s;
 assign Greater  = (Sel) ? gt_u : gt_s;
 
@@ -84,8 +80,7 @@ end
 
 //Output Selection Block
 always @ (*) begin
-  case (Code)
-    
+  case (Code)  
     `ADD:      C = y_adder;
     `SHIFT_L:  C = y_shift_l;
     `SHIFT_R:  C = y_shift_r;
@@ -96,6 +91,7 @@ always @ (*) begin
     default:  begin
       C = 32'd0;
     end
-  endcase // Code
+  endcase
 end
+
 endmodule

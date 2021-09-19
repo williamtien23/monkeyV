@@ -1,6 +1,6 @@
 # riscv32i_w1
 <strong> About The Project </strong> <br> 
- This is my first implementation of a RISCV architecture. The implementation is 5-stage pipelined. It currently stalls during all hazards. It currently has no internal instruction or data memory. The project uses a C++ wrapper to provide the core with an external "ideal 1 cycle read/write" 2 MiB of memory. This implementation has passed the risc-v arch tests and is "RISC-V Architecture Test compliant", but has not been formally verified.
+ This is my first implementation of a RISC-V architecture. The implementation is 5-stage pipelined. It currently stalls during all hazards. It currently has no internal instruction or data memory. The project uses a C++ wrapper to provide the core with an external "ideal 1 cycle read/write" 2 MiB of memory. This implementation has passed the risc-v arch tests and is "RISC-V Architecture Test compliant", but has not been formally verified.
 <br> 
 
 <strong> Some Quantitative Details </strong> <br> 

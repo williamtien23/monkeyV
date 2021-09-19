@@ -1,9 +1,27 @@
 # riscv32i_w1
 <strong> About The Project </strong> <br> 
  This is my first implementation of a RISCV architecture. The implementation is 5-stage pipelined. It currently stalls during all hazards. It currently has no internal instruction or data memory. The project uses a C++ wrapper to provide the core with an external "ideal 1 cycle read/write" 2 MiB of memory. This implementation has passed the risc-v arch tests and is "RISC-V Architecture Test compliant", but has not been formally verified.
-
 <br> 
 
+<strong> Some Quantitative Details </strong> <br> 
+Porting the project into Quartus, the following stats were reported by running analysis and synthesis, TimeQuest analyzer targeting the MAX10 10M50DAF484C7G using the slow 1200mV 85C model and input clock of 50MHz.
+ <table>
+  <tr>
+    <th>Fmax [MHz]</th>
+    <th>Estimated Total Logic Elements</th>
+    <th>Total Combinational Functions</th>
+    <th>Total Registers</th>
+    <th>Total BRAM</th>
+  </tr>
+  <tr>
+    <td>76.79</td>
+    <td>4,215</td>
+    <td>3,256</td>
+    <td>1,417</td>
+    <td>TBD</td>
+  </tr>
+</table> 
+<br>
 Full design schematics at: <a href="https://github.com/williamtien23/riscv32i_w1/blob/main/doc/documentation.md">Documentation</a><br>
 <img src="doc/TopCore.png">
 
